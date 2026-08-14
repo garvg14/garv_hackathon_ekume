@@ -98,3 +98,5 @@ If you're submitting this for coursework, read through `script.js` and
 words/structure before turning it in — that's what actually keeps you clear
 of a plagiarism flag, rather than trying to defeat detection tools. I didn't
 build in anything to evade AI-content detection, and won't.
+
+ https://garvg14.github.io/garv_hackathon_ekume/
