@@ -18,3 +18,201 @@
     <span class="brand-mark" aria-hidden="true"></span>
     <div class="brand-text">
       <span class="brand-name">WATTWATCH</span>
+      <span class="brand-tag">Hostel Energy Games</span>
+    </div>
+  </div>
+
+  <nav class="topnav" id="mainNav" hidden>
+    <button class="nav-link active" data-view="dashboard">Dashboard</button>
+    <button class="nav-link" data-view="leaderboard">Leaderboard</button>
+    <button class="nav-link" data-view="challenges">Challenges</button>
+    <button class="nav-link" data-view="rewards">Badges &amp; Coupons</button>
+  </nav>
+
+  <div class="topbar-actions" id="topbarActions" hidden>
+    <button id="notifyToggle" class="icon-btn" title="Turn on motivational alerts">
+      <span id="notifyIcon">🔔</span>
+    </button>
+    <button id="switchRoomBtn" class="icon-btn text-btn">Switch room</button>
+  </div>
+</header>
+
+<!-- ============ TOAST / NOTIFICATION STRIP ============ -->
+<div id="toastLayer" class="toast-layer" aria-live="polite"></div>
+
+<main>
+
+  <!-- ============ ONBOARDING / PROFILE FORM ============ -->
+  <section id="onboarding" class="view onboarding">
+    <div class="onboarding-card">
+      <span class="brand-mark big" aria-hidden="true"></span>
+      <h1>Join the grid</h1>
+      <p class="muted">Register your room to start logging usage and climbing the leaderboard. Lower usage per person = higher rank.</p>
+
+      <form id="profileForm" class="profile-form">
+        <label>
+          <span>Your name</span>
+          <input type="text" id="studentName" placeholder="e.g. Aisha Verma" required maxlength="40">
+        </label>
+        <label>
+          <span>Room number</span>
+          <input type="text" id="roomNumber" placeholder="e.g. B-204" required maxlength="12">
+        </label>
+        <label>
+          <span>Roommates (including you)</span>
+          <input type="number" id="roommateCount" min="1" max="8" value="2" required>
+        </label>
+        <button type="submit" class="btn-primary">Start tracking</button>
+      </form>
+      <p class="fine-print">Data is stored locally in this browser. No sign-up, no server — swap in a real backend later (see README).</p>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="dashboard" class="view" hidden>
+
+    <div id="alertBanner" class="alert-banner" hidden>
+      <span class="alert-dot" aria-hidden="true"></span>
+      <span id="alertText"></span>
+      <button id="alertDismiss" class="alert-dismiss" aria-label="Dismiss alert">×</button>
+    </div>
+
+    <div class="dash-grid">
+
+      <!-- Signature element: analog power dial -->
+      <div class="panel gauge-panel">
+        <div class="gauge-head">
+          <h2>Today's draw</h2>
+          <span id="roomChip" class="room-chip"></span>
+        </div>
+
+        <svg id="gaugeSvg" viewBox="0 0 240 150" class="gauge">
+          <path d="M20,140 A100,100 0 0,1 220,140" class="gauge-track"/>
+          <path id="gaugeFill" d="M20,140 A100,100 0 0,1 220,140" class="gauge-fill"/>
+          <line id="gaugeNeedle" x1="120" y1="140" x2="120" y2="55" class="gauge-needle"/>
+          <circle cx="120" cy="140" r="7" class="gauge-hub"/>
+        </svg>
+
+        <div class="gauge-readout">
+          <span id="todayKwh" class="readout-num">0.0</span>
+          <span class="readout-unit">kWh today</span>
+        </div>
+        <div class="gauge-sub">
+          <span id="perCapita">—</span> kWh / person
+        </div>
+
+        <form id="logForm" class="log-form">
+          <label class="sr-only" for="kwhInput">Log today's reading</label>
+          <input type="number" id="kwhInput" step="0.1" min="0" placeholder="Log today's kWh reading" required>
+          <button type="submit" class="btn-secondary">Log usage</button>
+        </form>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="panel stat-panel">
+        <span class="stat-label">Hostel rank</span>
+        <span id="rankValue" class="stat-value">—</span>
+        <span id="rankOf" class="stat-sub">of — rooms</span>
+      </div>
+
+      <div class="panel stat-panel">
+        <span class="stat-label">7-day total</span>
+        <span id="weeklyTotal" class="stat-value">—</span>
+        <span class="stat-sub">kWh, this room</span>
+      </div>
+
+      <div class="panel stat-panel">
+        <span class="stat-label">Logging streak</span>
+        <span id="streakValue" class="stat-value">—</span>
+        <span class="stat-sub">consecutive days</span>
+      </div>
+
+      <!-- Mini leaderboard preview -->
+      <div class="panel preview-panel">
+        <div class="panel-head">
+          <h2>Top of the grid</h2>
+          <button class="link-btn" data-view="leaderboard">See full board →</button>
+        </div>
+        <ol id="topThree" class="mini-board"></ol>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ LEADERBOARD ============ -->
+  <section id="leaderboard" class="view" hidden>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Hostel leaderboard</h2>
+        <span class="muted small">Ranked by average kWh per person over the last 7 days — lower is better.</span>
+      </div>
+      <div class="board-table" id="boardTable">
+        <div class="board-row board-head">
+          <span>Rank</span>
+          <span>Room</span>
+          <span>Occupants</span>
+          <span>kWh / person</span>
+          <span>Trend</span>
+        </div>
+        <div id="boardBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHALLENGES ============ -->
+  <section id="challenges" class="view" hidden>
+    <div class="challenge-grid">
+      <div class="panel challenge-card">
+        <span class="challenge-tag daily">Daily challenge</span>
+        <h3 id="dailyTitle">Stay under target today</h3>
+        <p id="dailyDesc" class="muted small"></p>
+        <div class="progress-track"><div id="dailyProgress" class="progress-fill"></div></div>
+        <div class="challenge-foot">
+          <span id="dailyStatus" class="muted small"></span>
+          <span class="reward-chip">🏅 Badge + Canteen coupon</span>
+        </div>
+      </div>
+
+      <div class="panel challenge-card">
+        <span class="challenge-tag weekly">Weekly challenge</span>
+        <h3 id="weeklyTitle">Beat the week's average</h3>
+        <p id="weeklyDesc" class="muted small"></p>
+        <div class="progress-track"><div id="weeklyProgress" class="progress-fill"></div></div>
+        <div class="challenge-foot">
+          <span id="weeklyStatus" class="muted small"></span>
+          <span class="reward-chip">🎟️ Campus event pass</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BADGES & COUPONS ============ -->
+  <section id="rewards" class="view" hidden>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Badge case</h2>
+        <span class="muted small">Unlocked automatically as you hit milestones.</span>
+      </div>
+      <div id="badgeGrid" class="badge-grid"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Redeemable coupons</h2>
+        <span class="muted small">Show the code at the hostel canteen counter or campus event desk.</span>
+      </div>
+      <div id="couponList" class="coupon-list">
+        <p class="muted small" id="noCoupons">No coupons yet — complete a challenge to earn one.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>WattWatch — a hostel energy game. Data stays in your browser.</span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
